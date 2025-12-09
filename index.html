@@ -1,0 +1,1589 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Agent Builder Studio</title>
+  <style>
+    body {
+      box-sizing: border-box;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      width: 100%;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #0a0e27 0%, #1a1d3e 50%, #0f1629 100%);
+      color: #e4e7f1;
+      overflow-x: hidden;
+      width: 100%;
+    }
+
+    .main-wrapper {
+      width: 100%;
+      height: 100%;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+
+    /* Navigation */
+    .navbar {
+      width: 100%;
+      padding: 1.5rem 3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(10, 14, 39, 0.8);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(99, 102, 241, 0.2);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 1.5rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #818cf8 0%, #c084fc 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: #cbd5e1;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s;
+      cursor: pointer;
+    }
+
+    .nav-links a:hover {
+      color: #818cf8;
+    }
+
+    /* Page Container */
+    .page {
+      display: none;
+      width: 100%;
+      padding: 3rem;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Homepage */
+    .hero {
+      text-align: center;
+      padding: 6rem 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .hero h1 {
+      font-size: 4rem;
+      font-weight: 800;
+      margin-bottom: 1.5rem;
+      background: linear-gradient(135deg, #818cf8 0%, #c084fc 50%, #60a5fa 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.2;
+    }
+
+    .hero p {
+      font-size: 1.5rem;
+      color: #94a3b8;
+      margin-bottom: 3rem;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .cta-buttons {
+      display: flex;
+      gap: 1.5rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 1rem 2.5rem;
+      border: none;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      color: white;
+      box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(99, 102, 241, 0.6);
+    }
+
+    .btn-secondary {
+      background: rgba(99, 102, 241, 0.1);
+      color: #818cf8;
+      border: 2px solid #6366f1;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(99, 102, 241, 0.2);
+      transform: translateY(-2px);
+    }
+
+    /* Hero Illustration */
+    .hero-illustration {
+      margin-top: 5rem;
+      position: relative;
+      height: 400px;
+    }
+
+    .flow-diagram {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .flow-node {
+      background: rgba(99, 102, 241, 0.15);
+      border: 2px solid #6366f1;
+      border-radius: 16px;
+      padding: 1.5rem 2rem;
+      min-width: 120px;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(99, 102, 241, 0.3);
+      animation: float 3s ease-in-out infinite;
+    }
+
+    .flow-node:nth-child(2) { animation-delay: 0.5s; }
+    .flow-node:nth-child(3) { animation-delay: 1s; }
+    .flow-node:nth-child(4) { animation-delay: 1.5s; }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .flow-arrow {
+      color: #818cf8;
+      font-size: 2rem;
+    }
+
+    /* Editor Page */
+    .editor-container {
+      display: flex;
+      width: 100%;
+      height: calc(100% - 100px);
+      gap: 1rem;
+    }
+
+    .editor-toolbar {
+      width: 100%;
+      background: rgba(30, 34, 58, 0.6);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-radius: 12px;
+      margin-bottom: 1rem;
+      border: 1px solid rgba(99, 102, 241, 0.2);
+    }
+
+    .toolbar-buttons {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .toolbar-btn {
+      padding: 0.6rem 1.5rem;
+      background: rgba(99, 102, 241, 0.2);
+      border: 1px solid #6366f1;
+      border-radius: 8px;
+      color: #cbd5e1;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 0.95rem;
+    }
+
+    .toolbar-btn:hover {
+      background: rgba(99, 102, 241, 0.3);
+    }
+
+    .component-panel {
+      width: 280px;
+      background: rgba(30, 34, 58, 0.6);
+      border-radius: 12px;
+      padding: 1.5rem;
+      border: 1px solid rgba(99, 102, 241, 0.2);
+      overflow-y: auto;
+    }
+
+    .canvas {
+      flex: 1;
+      background: rgba(15, 22, 41, 0.4);
+      border-radius: 12px;
+      padding: 3rem;
+      border: 1px solid rgba(99, 102, 241, 0.2);
+      position: relative;
+      overflow: auto;
+      min-height: 600px;
+    }
+
+    .canvas.drag-over {
+      border-color: #818cf8;
+      background: rgba(99, 102, 241, 0.1);
+    }
+
+    .canvas-node {
+      position: absolute;
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%);
+      border: 2px solid #6366f1;
+      border-radius: 12px;
+      padding: 1.2rem 1.8rem;
+      min-width: 160px;
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+      cursor: move;
+      transition: all 0.3s;
+    }
+
+    .canvas-node:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 25px rgba(99, 102, 241, 0.5);
+      z-index: 10;
+    }
+
+    .canvas-node.selected {
+      border-color: #60a5fa;
+      box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.3);
+    }
+
+    .delete-btn {
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      width: 24px;
+      height: 24px;
+      background: #ef4444;
+      border: 2px solid #0a0e27;
+      border-radius: 50%;
+      color: white;
+      font-size: 0.8rem;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s;
+    }
+
+    .canvas-node:hover .delete-btn {
+      display: flex;
+    }
+
+    .delete-btn:hover {
+      background: #dc2626;
+      transform: scale(1.1);
+    }
+
+    .properties-panel {
+      width: 280px;
+      background: rgba(30, 34, 58, 0.6);
+      border-radius: 12px;
+      padding: 1.5rem;
+      border: 1px solid rgba(99, 102, 241, 0.2);
+      overflow-y: auto;
+    }
+
+    .panel-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      color: #818cf8;
+    }
+
+    .component-category {
+      margin-bottom: 2rem;
+    }
+
+    .category-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #94a3b8;
+      margin-bottom: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .component-item {
+      background: rgba(99, 102, 241, 0.15);
+      border: 1px solid #6366f1;
+      border-radius: 8px;
+      padding: 0.8rem 1rem;
+      margin-bottom: 0.8rem;
+      cursor: move;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    .component-item:hover {
+      background: rgba(99, 102, 241, 0.25);
+      transform: translateX(5px);
+    }
+
+    .component-item.dragging {
+      opacity: 0.5;
+    }
+
+    .component-icon {
+      font-size: 1.3rem;
+    }
+
+    .workflow {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+      align-items: center;
+    }
+
+    .workflow-row {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .workflow-node {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%);
+      border: 2px solid #6366f1;
+      border-radius: 12px;
+      padding: 1.2rem 1.8rem;
+      min-width: 160px;
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+      transition: all 0.3s;
+    }
+
+    .workflow-node:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 25px rgba(99, 102, 241, 0.5);
+    }
+
+    .node-label {
+      font-weight: 600;
+      font-size: 1rem;
+      color: #e4e7f1;
+    }
+
+    .node-type {
+      font-size: 0.75rem;
+      color: #94a3b8;
+      margin-top: 0.3rem;
+    }
+
+    .connection-arrow {
+      color: #818cf8;
+      font-size: 1.8rem;
+    }
+
+    /* Component Library */
+    .component-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .component-card {
+      background: rgba(30, 34, 58, 0.6);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      border-radius: 16px;
+      padding: 2rem;
+      transition: all 0.3s;
+    }
+
+    .component-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 30px rgba(99, 102, 241, 0.4);
+      border-color: #6366f1;
+    }
+
+    .card-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    .card-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 0.8rem;
+      color: #cbd5e1;
+    }
+
+    .card-description {
+      color: #94a3b8;
+      line-height: 1.6;
+    }
+
+    /* How It Works */
+    .steps-container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .step {
+      display: flex;
+      gap: 2rem;
+      margin-bottom: 4rem;
+      align-items: center;
+    }
+
+    .step:nth-child(even) {
+      flex-direction: row-reverse;
+    }
+
+    .step-number {
+      font-size: 4rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      min-width: 80px;
+    }
+
+    .step-content {
+      flex: 1;
+    }
+
+    .step-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      color: #cbd5e1;
+    }
+
+    .step-description {
+      color: #94a3b8;
+      line-height: 1.8;
+      font-size: 1.1rem;
+    }
+
+    /* Examples */
+    .examples-grid {
+      display: grid;
+      gap: 3rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .example-card {
+      background: rgba(30, 34, 58, 0.6);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      border-radius: 16px;
+      padding: 2.5rem;
+    }
+
+    .example-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 2rem;
+      color: #818cf8;
+    }
+
+    .example-flow {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    /* Style Guide */
+    .style-section {
+      margin-bottom: 4rem;
+    }
+
+    .section-title {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 2rem;
+      color: #818cf8;
+    }
+
+    .color-palette {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .color-swatch {
+      height: 120px;
+      border-radius: 12px;
+      display: flex;
+      align-items: flex-end;
+      padding: 1rem;
+      font-weight: 600;
+      font-size: 0.9rem;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .icon-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .icon-item {
+      text-align: center;
+      padding: 1.5rem;
+      background: rgba(30, 34, 58, 0.6);
+      border-radius: 12px;
+      border: 1px solid rgba(99, 102, 241, 0.2);
+    }
+
+    .icon-symbol {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .icon-name {
+      font-size: 0.85rem;
+      color: #94a3b8;
+    }
+
+    .page-header {
+      text-align: center;
+      margin-bottom: 4rem;
+    }
+
+    .page-title {
+      font-size: 3rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, #818cf8 0%, #c084fc 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .page-subtitle {
+      font-size: 1.3rem;
+      color: #94a3b8;
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+  <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
+ </head>
+ <body>
+  <div class="main-wrapper"><!-- Navigation -->
+   <nav class="navbar">
+    <div class="logo">
+     <svg class="logo-icon" viewbox="0 0 100 100" fill="none"><rect x="10" y="10" width="30" height="30" rx="6" fill="url(#grad1)" opacity="0.9" /> <rect x="50" y="10" width="30" height="30" rx="6" fill="url(#grad1)" opacity="0.7" /> <rect x="10" y="50" width="30" height="30" rx="6" fill="url(#grad1)" opacity="0.6" /> <rect x="50" y="50" width="30" height="30" rx="6" fill="url(#grad1)" opacity="0.8" /> <line x1="40" y1="25" x2="50" y2="25" stroke="#818cf8" stroke-width="3" /> <line x1="25" y1="40" x2="25" y2="50" stroke="#818cf8" stroke-width="3" /> <line x1="65" y1="40" x2="65" y2="50" stroke="#818cf8" stroke-width="3" /> <defs>
+       <lineargradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" style="stop-color:#6366f1;stop-opacity:1" />
+        <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:1" />
+       </lineargradient>
+      </defs>
+     </svg><span>AI Agent Builder Studio</span>
+    </div>
+    <ul class="nav-links">
+     <li><a onclick="showPage('home')">Home</a></li>
+     <li><a onclick="showPage('editor')">Editor</a></li>
+     <li><a onclick="showPage('library')">Components</a></li>
+     <li><a onclick="showPage('how-it-works')">How It Works</a></li>
+     <li><a onclick="showPage('examples')">Examples</a></li>
+     <li><a onclick="showPage('style-guide')">Style Guide</a></li>
+    </ul>
+   </nav><!-- Homepage -->
+   <div id="home" class="page active">
+    <div class="hero">
+     <h1 id="hero-title">AI Agent Builder Studio</h1>
+     <p id="hero-subtitle">Design AI pipelines visually. Drag, connect, and deploy intelligent agents.</p>
+     <div class="cta-buttons"><button class="btn btn-primary" id="btn-primary" onclick="showPage('editor')">Start Building</button> <button class="btn btn-secondary" id="btn-secondary" onclick="showPage('examples')">Explore Examples</button>
+     </div>
+     <div class="hero-illustration">
+      <div class="flow-diagram">
+       <div class="flow-node">
+        <div class="component-icon">
+         📥
+        </div>
+        <div class="node-label">
+         Input
+        </div>
+       </div>
+       <div class="flow-arrow">
+        →
+       </div>
+       <div class="flow-node">
+        <div class="component-icon">
+         🧠
+        </div>
+        <div class="node-label">
+         AI Model
+        </div>
+       </div>
+       <div class="flow-arrow">
+        →
+       </div>
+       <div class="flow-node">
+        <div class="component-icon">
+         🔍
+        </div>
+        <div class="node-label">
+         Search
+        </div>
+       </div>
+       <div class="flow-arrow">
+        →
+       </div>
+       <div class="flow-node">
+        <div class="component-icon">
+         📤
+        </div>
+        <div class="node-label">
+         Output
+        </div>
+       </div>
+      </div>
+     </div>
+    </div>
+   </div><!-- Editor Page -->
+   <div id="editor" class="page">
+    <div class="editor-toolbar">
+     <div class="toolbar-buttons"><button class="toolbar-btn" onclick="runWorkflow()">▶️ Run</button> <button class="toolbar-btn" onclick="stopWorkflow()">⏹️ Stop</button> <button class="toolbar-btn" onclick="saveWorkflow()">💾 Save</button> <button class="toolbar-btn" onclick="exportWorkflow()">📤 Export</button> <button class="toolbar-btn" onclick="clearCanvas()">🗑️ Clear</button>
+     </div>
+     <div class="toolbar-buttons"><button class="toolbar-btn" onclick="toggleLogs()">📋 Logs</button>
+     </div>
+    </div>
+    <div id="logs-panel" style="display: none; background: rgba(30, 34, 58, 0.9); border: 1px solid #6366f1; border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; max-height: 200px; overflow-y: auto;">
+     <h4 style="color: #818cf8; margin-bottom: 1rem;">Execution Logs</h4>
+     <div id="logs-content" style="font-family: monospace; font-size: 0.9rem; color: #cbd5e1;">
+      <div style="color: #94a3b8;">
+       Ready to execute workflow...
+      </div>
+     </div>
+    </div>
+    <div class="editor-container">
+     <div class="component-panel">
+      <h3 class="panel-title">Components</h3>
+      <div class="component-category">
+       <div class="category-title">
+        AI Models
+       </div>
+       <div class="component-item" draggable="true" data-type="MODEL" data-name="Small Model" data-icon="🤖"><span class="component-icon">🤖</span> <span>Small Model</span>
+       </div>
+       <div class="component-item" draggable="true" data-type="MODEL" data-name="Medium Model" data-icon="🧠"><span class="component-icon">🧠</span> <span>Medium Model</span>
+       </div>
+       <div class="component-item" draggable="true" data-type="MODEL" data-name="Large Model" data-icon="🎯"><span class="component-icon">🎯</span> <span>Large Model</span>
+       </div>
+      </div>
+      <div class="component-category">
+       <div class="category-title">
+        Retrieval
+       </div>
+       <div class="component-item" draggable="true" data-type="DATA" data-name="Vector Database" data-icon="🗄️"><span class="component-icon">🗄️</span> <span>Vector Database</span>
+       </div>
+       <div class="component-item" draggable="true" data-type="PROCESSOR" data-name="RAG Processor" data-icon="📚"><span class="component-icon">📚</span> <span>RAG Processor</span>
+       </div>
+       <div class="component-item" draggable="true" data-type="RETRIEVAL" data-name="Search Node" data-icon="🔍"><span class="component-icon">🔍</span> <span>Search Node</span>
+       </div>
+      </div>
+      <div class="component-category">
+       <div class="category-title">
+        Logic
+       </div>
+       <div class="component-item" draggable="true" data-type="LOGIC" data-name="Router" data-icon="🔀"><span class="component-icon">🔀</span> <span>Router</span>
+       </div>
+       <div class="component-item" draggable="true" data-type="LOGIC" data-name="If / Else" data-icon="❓"><span class="component-icon">❓</span> <span>If / Else</span>
+       </div>
+       <div class="component-item" draggable="true" data-type="LOGIC" data-name="Loop" data-icon="🔁"><span class="component-icon">🔁</span> <span>Loop</span>
+       </div>
+      </div>
+      <div class="component-category">
+       <div class="category-title">
+        Tools
+       </div>
+       <div class="component-item" draggable="true" data-type="TOOL" data-name="API Call" data-icon="🔌"><span class="component-icon">🔌</span> <span>API Call</span>
+       </div>
+       <div class="component-item" draggable="true" data-type="TOOL" data-name="Web Scraper" data-icon="🌐"><span class="component-icon">🌐</span> <span>Web Scraper</span>
+       </div>
+      </div>
+     </div>
+     <div class="canvas" id="canvas">
+      <div style="text-align: center; color: #94a3b8; margin-top: 10rem; pointer-events: none;">
+       <div style="font-size: 3rem; margin-bottom: 1rem;">
+        🎯
+       </div>
+       <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem;">Drag components here to start building</h3>
+       <p>Create your AI workflow by connecting nodes</p>
+      </div>
+     </div>
+     <div class="properties-panel">
+      <h3 class="panel-title">Properties</h3>
+      <p style="color: #94a3b8; font-size: 0.95rem;">Select a node to view and edit its properties</p>
+     </div>
+    </div>
+   </div><!-- Component Library -->
+   <div id="library" class="page">
+    <div class="page-header">
+     <h1 class="page-title">Component Library</h1>
+     <p class="page-subtitle">Build powerful AI workflows with modular components</p>
+    </div>
+    <div class="component-grid"><!-- AI Models -->
+     <div class="component-card">
+      <div class="card-icon">
+       🤖
+      </div>
+      <h3 class="card-title">Small Model</h3>
+      <p class="card-description">Fast, efficient AI model for simple tasks. Low latency, optimized for speed.</p>
+     </div>
+     <div class="component-card">
+      <div class="card-icon">
+       🧠
+      </div>
+      <h3 class="card-title">Medium Model</h3>
+      <p class="card-description">Balanced performance and capability. Suitable for most use cases.</p>
+     </div>
+     <div class="component-card">
+      <div class="card-icon">
+       🎯
+      </div>
+      <h3 class="card-title">Large Model</h3>
+      <p class="card-description">Maximum capability and reasoning. Best for complex tasks requiring deep understanding.</p>
+     </div><!-- Retrieval -->
+     <div class="component-card">
+      <div class="card-icon">
+       🗄️
+      </div>
+      <h3 class="card-title">Vector Database</h3>
+      <p class="card-description">Store and retrieve embeddings efficiently. Enables semantic search and similarity matching.</p>
+     </div>
+     <div class="component-card">
+      <div class="card-icon">
+       📚
+      </div>
+      <h3 class="card-title">RAG Processor</h3>
+      <p class="card-description">Retrieval-Augmented Generation. Combines retrieval with generation for accurate responses.</p>
+     </div>
+     <div class="component-card">
+      <div class="card-icon">
+       🔍
+      </div>
+      <h3 class="card-title">Search Node</h3>
+      <p class="card-description">Search external sources and databases. Integrates web search and custom data sources.</p>
+     </div>
+     <div class="component-card">
+      <div class="card-icon">
+       📇
+      </div>
+      <h3 class="card-title">Index Builder</h3>
+      <p class="card-description">Create searchable indexes from your data. Supports multiple indexing strategies.</p>
+     </div><!-- Logic -->
+     <div class="component-card">
+      <div class="card-icon">
+       🔀
+      </div>
+      <h3 class="card-title">Router</h3>
+      <p class="card-description">Intelligent routing based on input analysis. Directs flow to appropriate branches.</p>
+     </div>
+     <div class="component-card">
+      <div class="card-icon">
+       ❓
+      </div>
+      <h3 class="card-title">If / Else</h3>
+      <p class="card-description">Conditional branching logic. Execute different paths based on conditions.</p>
+     </div>
+     <div class="component-card">
+      <div class="card-icon">
+       🔁
+      </div>
+      <h3 class="card-title">Loop</h3>
+      <p class="card-description">Iterate over collections or repeat operations. Supports various loop patterns.</p>
+     </div><!-- Tools -->
+     <div class="component-card">
+      <div class="card-icon">
+       🔌
+      </div>
+      <h3 class="card-title">API Call</h3>
+      <p class="card-description">Connect to external APIs. Supports REST, GraphQL, and custom protocols.</p>
+     </div>
+     <div class="component-card">
+      <div class="card-icon">
+       🌐
+      </div>
+      <h3 class="card-title">Web Scraper</h3>
+      <p class="card-description">Extract data from websites. Configurable selectors and parsing rules.</p>
+     </div>
+     <div class="component-card">
+      <div class="card-icon">
+       🧮
+      </div>
+      <h3 class="card-title">Calculator</h3>
+      <p class="card-description">Perform mathematical operations and data transformations.</p>
+     </div>
+     <div class="component-card">
+      <div class="card-icon">
+       ✨
+      </div>
+      <h3 class="card-title">Text Cleaner</h3>
+      <p class="card-description">Clean and normalize text data. Remove noise and standardize formats.</p>
+     </div>
+    </div>
+   </div><!-- How It Works -->
+   <div id="how-it-works" class="page">
+    <div class="page-header">
+     <h1 class="page-title">How It Works</h1>
+     <p class="page-subtitle">Build AI agents in four simple steps</p>
+    </div>
+    <div class="steps-container">
+     <div class="step">
+      <div class="step-number">
+       01
+      </div>
+      <div class="step-content">
+       <h3 class="step-title">Design Your Workflow</h3>
+       <p class="step-description">Drag and drop components onto the canvas to create your AI pipeline. Connect nodes to define the flow of data through your agent. Each component represents a specific function in your workflow.</p>
+      </div>
+     </div>
+     <div class="step">
+      <div class="step-number">
+       02
+      </div>
+      <div class="step-content">
+       <h3 class="step-title">Configure Components</h3>
+       <p class="step-description">Select any node to customize its properties. Configure AI models, set search parameters, define logic conditions, and connect to external APIs. Each component offers specialized settings for your use case.</p>
+      </div>
+     </div>
+     <div class="step">
+      <div class="step-number">
+       03
+      </div>
+      <div class="step-content">
+       <h3 class="step-title">Execute &amp; Monitor</h3>
+       <p class="step-description">Run your workflow with real data. The platform processes each node in sequence, transforming and routing data according to your design. Monitor execution in real-time with detailed logs and debug information.</p>
+      </div>
+     </div>
+     <div class="step">
+      <div class="step-number">
+       04
+      </div>
+      <div class="step-content">
+       <h3 class="step-title">Deploy &amp; Scale</h3>
+       <p class="step-description">Export your agent for production deployment. The system converts your visual workflow into an optimized execution graph. Scale horizontally to handle increasing loads while maintaining performance.</p>
+      </div>
+     </div>
+    </div>
+   </div><!-- Examples -->
+   <div id="examples" class="page">
+    <div class="page-header">
+     <h1 class="page-title">Example Workflows</h1>
+     <p class="page-subtitle">Pre-built templates to get you started</p>
+    </div>
+    <div class="examples-grid">
+     <div class="example-card">
+      <h3 class="example-title">Research Agent</h3>
+      <div class="example-flow">
+       <div class="flow-node">
+        <div class="component-icon">
+         📥
+        </div>
+        <div class="node-label">
+         Input
+        </div>
+       </div>
+       <div class="flow-arrow">
+        →
+       </div>
+       <div class="flow-node">
+        <div class="component-icon">
+         🔍
+        </div>
+        <div class="node-label">
+         Analyzer
+        </div>
+       </div>
+       <div class="flow-arrow">
+        →
+       </div>
+       <div class="flow-node">
+        <div class="component-icon">
+         🌐
+        </div>
+        <div class="node-label">
+         Web Search
+        </div>
+       </div>
+       <div class="flow-arrow">
+        →
+       </div>
+       <div class="flow-node">
+        <div class="component-icon">
+         📝
+        </div>
+        <div class="node-label">
+         Summarizer
+        </div>
+       </div>
+       <div class="flow-arrow">
+        →
+       </div>
+       <div class="flow-node">
+        <div class="component-icon">
+         📤
+        </div>
+        <div class="node-label">
+         Output
+        </div>
+       </div>
+      </div>
+     </div>
+     <div class="example-card">
+      <h3 class="example-title">RAG Chatbot</h3>
+      <div class="example-flow">
+       <div class="flow-node">
+        <div class="component-icon">
+         📥
+        </div>
+        <div class="node-label">
+         Input
+        </div>
+       </div>
+       <div class="flow-arrow">
+        →
+       </div>
+       <div class="flow-node">
+        <div class="component-icon">
+         🔤
+        </div>
+        <div class="node-label">
+         Embedder
+        </div>
+       </div>
+       <div class="flow-arrow">
+        →
+       </div>
+       <div class="flow-node">
+        <div class="component-icon">
+         🗄️
+        </div>
+        <div class="node-label">
+         Vector DB
+        </div>
+       </div>
+       <div class="flow-arrow">
+        →
+       </div>
+       <div class="flow-node">
+        <div class="component-icon">
+         📚
+        </div>
+        <div class="node-label">
+         Retriever
+        </div>
+       </div>
+       <div class="flow-arrow">
+        →
+       </div>
+       <div class="flow-node">
+        <div class="component-icon">
+         🧠
+        </div>
+        <div class="node-label">
+         AI Model
+        </div>
+       </div>
+       <div class="flow-arrow">
+        →
+       </div>
+       <div class="flow-node">
+        <div class="component-icon">
+         ���
+        </div>
+        <div class="node-label">
+         Output
+        </div>
+       </div>
+      </div>
+     </div>
+     <div class="example-card">
+      <h3 class="example-title">Multi-Step Reasoner</h3>
+      <div class="example-flow">
+       <div class="flow-node">
+        <div class="component-icon">
+         📥
+        </div>
+        <div class="node-label">
+         Input
+        </div>
+       </div>
+       <div class="flow-arrow">
+        →
+       </div>
+       <div class="flow-node">
+        <div class="component-icon">
+         🔀
+        </div>
+        <div class="node-label">
+         Router
+        </div>
+       </div>
+       <div class="flow-arrow">
+        →
+       </div>
+       <div class="flow-node">
+        <div class="component-icon">
+         🤖
+        </div>
+        <div class="node-label">
+         Model A
+        </div>
+       </div>
+       <div class="flow-arrow">
+        →
+       </div>
+       <div class="flow-node">
+        <div class="component-icon">
+         🧠
+        </div>
+        <div class="node-label">
+         Model B
+        </div>
+       </div>
+       <div class="flow-arrow">
+        →
+       </div>
+       <div class="flow-node">
+        <div class="component-icon">
+         ���
+        </div>
+        <div class="node-label">
+         Synthesizer
+        </div>
+       </div>
+       <div class="flow-arrow">
+        →
+       </div>
+       <div class="flow-node">
+        <div class="component-icon">
+         ✅
+        </div>
+        <div class="node-label">
+         Result
+        </div>
+       </div>
+      </div>
+     </div>
+    </div>
+   </div><!-- Style Guide -->
+   <div id="style-guide" class="page">
+    <div class="page-header">
+     <h1 class="page-title">Style Guide</h1>
+     <p class="page-subtitle">Design system and visual language</p>
+    </div>
+    <div class="style-section">
+     <h2 class="section-title">Color Palette</h2>
+     <div class="color-palette">
+      <div class="color-swatch" style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);">
+       Primary Gradient
+      </div>
+      <div class="color-swatch" style="background: #6366f1;">
+       Primary Blue
+      </div>
+      <div class="color-swatch" style="background: #8b5cf6;">
+       Primary Purple
+      </div>
+      <div class="color-swatch" style="background: #60a5fa;">
+       Accent Blue
+      </div>
+      <div class="color-swatch" style="background: #c084fc;">
+       Accent Purple
+      </div>
+      <div class="color-swatch" style="background: #0a0e27; border: 1px solid #6366f1;">
+       Background Dark
+      </div>
+      <div class="color-swatch" style="background: #1a1d3e;">
+       Surface
+      </div>
+      <div class="color-swatch" style="background: #e4e7f1; color: #0a0e27;">
+       Text Primary
+      </div>
+      <div class="color-swatch" style="background: #cbd5e1; color: #0a0e27;">
+       Text Secondary
+      </div>
+      <div class="color-swatch" style="background: #94a3b8; color: #0a0e27;">
+       Text Muted
+      </div>
+     </div>
+    </div>
+    <div class="style-section">
+     <h2 class="section-title">Component Icons</h2>
+     <div class="icon-grid">
+      <div class="icon-item">
+       <div class="icon-symbol">
+        🤖
+       </div>
+       <div class="icon-name">
+        Small Model
+       </div>
+      </div>
+      <div class="icon-item">
+       <div class="icon-symbol">
+        🧠
+       </div>
+       <div class="icon-name">
+        Medium Model
+       </div>
+      </div>
+      <div class="icon-item">
+       <div class="icon-symbol">
+        🎯
+       </div>
+       <div class="icon-name">
+        Large Model
+       </div>
+      </div>
+      <div class="icon-item">
+       <div class="icon-symbol">
+        🗄️
+       </div>
+       <div class="icon-name">
+        Vector DB
+       </div>
+      </div>
+      <div class="icon-item">
+       <div class="icon-symbol">
+        📚
+       </div>
+       <div class="icon-name">
+        RAG Processor
+       </div>
+      </div>
+      <div class="icon-item">
+       <div class="icon-symbol">
+        ���
+       </div>
+       <div class="icon-name">
+        Search
+       </div>
+      </div>
+      <div class="icon-item">
+       <div class="icon-symbol">
+        🔀
+       </div>
+       <div class="icon-name">
+        Router
+       </div>
+      </div>
+      <div class="icon-item">
+       <div class="icon-symbol">
+        ❓
+       </div>
+       <div class="icon-name">
+        If/Else
+       </div>
+      </div>
+      <div class="icon-item">
+       <div class="icon-symbol">
+        🔁
+       </div>
+       <div class="icon-name">
+        Loop
+       </div>
+      </div>
+      <div class="icon-item">
+       <div class="icon-symbol">
+        🔌
+       </div>
+       <div class="icon-name">
+        API Call
+       </div>
+      </div>
+      <div class="icon-item">
+       <div class="icon-symbol">
+        🌐
+       </div>
+       <div class="icon-name">
+        Web Scraper
+       </div>
+      </div>
+      <div class="icon-item">
+       <div class="icon-symbol">
+        📥
+       </div>
+       <div class="icon-name">
+        Input
+       </div>
+      </div>
+      <div class="icon-item">
+       <div class="icon-symbol">
+        📤
+       </div>
+       <div class="icon-name">
+        Output
+       </div>
+      </div>
+     </div>
+    </div>
+    <div class="style-section">
+     <h2 class="section-title">Node Styles</h2>
+     <div class="flow-diagram">
+      <div class="workflow-node">
+       <div class="node-label">
+        Standard Node
+       </div>
+       <div class="node-type">
+        TYPE
+       </div>
+      </div>
+      <div class="workflow-node" style="border-color: #60a5fa;">
+       <div class="node-label">
+        Accent Node
+       </div>
+       <div class="node-type">
+        TYPE
+       </div>
+      </div>
+      <div class="workflow-node" style="border-color: #c084fc;">
+       <div class="node-label">
+        Special Node
+       </div>
+       <div class="node-type">
+        TYPE
+       </div>
+      </div>
+     </div>
+    </div>
+    <div class="style-section">
+     <h2 class="section-title">Typography</h2>
+     <div style="color: #cbd5e1; line-height: 2;">
+      <h1 style="font-size: 3rem; margin-bottom: 1rem;">Heading 1 - 3rem</h1>
+      <h2 style="font-size: 2rem; margin-bottom: 1rem;">Heading 2 - 2rem</h2>
+      <h3 style="font-size: 1.5rem; margin-bottom: 1rem;">Heading 3 - 1.5rem</h3>
+      <p style="font-size: 1.1rem; margin-bottom: 1rem;">Body Large - 1.1rem - Used for important text and descriptions</p>
+      <p style="font-size: 1rem; margin-bottom: 1rem;">Body Regular - 1rem - Standard body text for most content</p>
+      <p style="font-size: 0.9rem; color: #94a3b8;">Body Small - 0.9rem - Used for secondary information and labels</p>
+     </div>
+    </div>
+   </div>
+  </div>
+  <script src="/_sdk/element_sdk.js"></script><!-- Module 1: Configuration & State Management -->
+  <script>
+    // Global state
+    const defaultConfig = {
+      main_title: "AI Agent Builder Studio",
+      subtitle: "Design AI pipelines visually. Drag, connect, and deploy intelligent agents.",
+      cta_primary: "Start Building",
+      cta_secondary: "Explore Examples"
+    };
+
+    let nodeIdCounter = 0;
+    let selectedNode = null;
+    let draggedNode = null;
+    let nodes = [];
+  </script><!-- Module 2: Navigation & Page Management -->
+  <script>
+    function showPage(pageId) {
+      const pages = document.querySelectorAll('.page');
+      pages.forEach(page => page.classList.remove('active'));
+      
+      const targetPage = document.getElementById(pageId);
+      if (targetPage) {
+        targetPage.classList.add('active');
+      }
+    }
+  </script><!-- Module 3: Drag & Drop for Components -->
+  <script>
+    function initializeDragAndDrop() {
+      const componentItems = document.querySelectorAll('.component-item');
+      const canvas = document.getElementById('canvas');
+
+      // Setup drag events for component items
+      componentItems.forEach(item => {
+        item.addEventListener('dragstart', (e) => {
+          item.classList.add('dragging');
+          e.dataTransfer.effectAllowed = 'copy';
+          e.dataTransfer.setData('componentType', item.dataset.type);
+          e.dataTransfer.setData('componentName', item.dataset.name);
+          e.dataTransfer.setData('componentIcon', item.dataset.icon);
+        });
+
+        item.addEventListener('dragend', (e) => {
+          item.classList.remove('dragging');
+        });
+      });
+
+      // Setup drop zone on canvas
+      canvas.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        canvas.classList.add('drag-over');
+      });
+
+      canvas.addEventListener('dragleave', (e) => {
+        if (e.target === canvas) {
+          canvas.classList.remove('drag-over');
+        }
+      });
+
+      canvas.addEventListener('drop', (e) => {
+        e.preventDefault();
+        canvas.classList.remove('drag-over');
+
+        const componentType = e.dataTransfer.getData('componentType');
+        const componentName = e.dataTransfer.getData('componentName');
+        const componentIcon = e.dataTransfer.getData('componentIcon');
+
+        const canvasRect = canvas.getBoundingClientRect();
+        const x = e.clientX - canvasRect.left - 80;
+        const y = e.clientY - canvasRect.top - 50;
+
+        addNodeToCanvas(componentName, componentType, componentIcon, x, y);
+      });
+    }
+  </script><!-- Module 4: Node Management -->
+  <script>
+    function addNodeToCanvas(name, type, icon, x, y) {
+      const nodeId = `node-${nodeIdCounter++}`;
+      const node = document.createElement('div');
+      node.className = 'canvas-node';
+      node.id = nodeId;
+      node.style.left = `${x}px`;
+      node.style.top = `${y}px`;
+      node.draggable = true;
+
+      node.innerHTML = `
+        <div class="delete-btn" onclick="deleteNode('${nodeId}')">×</div>
+        <div style="font-size: 2rem; margin-bottom: 0.5rem;">${icon}</div>
+        <div class="node-label">${name}</div>
+        <div class="node-type">${type}</div>
+      `;
+
+      nodes.push({ id: nodeId, name, type, icon, x, y });
+
+      node.addEventListener('click', () => selectNode(nodeId, name, type));
+      node.addEventListener('dragstart', handleNodeDragStart);
+      node.addEventListener('dragend', handleNodeDragEnd);
+
+      const canvas = document.getElementById('canvas');
+      const placeholder = canvas.querySelector('div[style*="pointer-events: none"]');
+      if (placeholder) {
+        placeholder.remove();
+      }
+      canvas.appendChild(node);
+    }
+
+    function handleNodeDragStart(e) {
+      draggedNode = e.target;
+      e.dataTransfer.effectAllowed = 'move';
+    }
+
+    function handleNodeDragEnd(e) {
+      if (draggedNode) {
+        const canvas = document.getElementById('canvas');
+        const canvasRect = canvas.getBoundingClientRect();
+        const x = e.clientX - canvasRect.left - 80;
+        const y = e.clientY - canvasRect.top - 50;
+        
+        draggedNode.style.left = `${Math.max(0, x)}px`;
+        draggedNode.style.top = `${Math.max(0, y)}px`;
+        
+        draggedNode = null;
+      }
+    }
+
+    function selectNode(nodeId, name, type) {
+      document.querySelectorAll('.canvas-node').forEach(n => n.classList.remove('selected'));
+      const node = document.getElementById(nodeId);
+      if (node) {
+        node.classList.add('selected');
+        selectedNode = nodeId;
+        updatePropertiesPanel(name, type);
+      }
+    }
+
+    function deleteNode(nodeId) {
+      const node = document.getElementById(nodeId);
+      if (node) {
+        node.remove();
+        nodes = nodes.filter(n => n.id !== nodeId);
+        
+        if (selectedNode === nodeId) {
+          selectedNode = null;
+          const panel = document.querySelector('.properties-panel');
+          panel.innerHTML = `
+            <h3 class="panel-title">Properties</h3>
+            <p style="color: #94a3b8; font-size: 0.95rem;">Select a node to view and edit its properties</p>
+          `;
+        }
+      }
+    }
+  </script><!-- Module 5: Properties Panel -->
+  <script>
+    function updatePropertiesPanel(name, type) {
+      const panel = document.querySelector('.properties-panel');
+      panel.innerHTML = `
+        <h3 class="panel-title">Properties</h3>
+        <div style="margin-bottom: 1.5rem;">
+          <label style="display: block; color: #94a3b8; font-size: 0.9rem; margin-bottom: 0.5rem;">Node Name</label>
+          <input type="text" value="${name}" style="width: 100%; padding: 0.6rem; background: rgba(15, 22, 41, 0.6); border: 1px solid #6366f1; border-radius: 8px; color: #e4e7f1; font-size: 0.95rem;" readonly>
+        </div>
+        <div style="margin-bottom: 1.5rem;">
+          <label style="display: block; color: #94a3b8; font-size: 0.9rem; margin-bottom: 0.5rem;">Node Type</label>
+          <input type="text" value="${type}" style="width: 100%; padding: 0.6rem; background: rgba(15, 22, 41, 0.6); border: 1px solid #6366f1; border-radius: 8px; color: #e4e7f1; font-size: 0.95rem;" readonly>
+        </div>
+        <div style="color: #94a3b8; font-size: 0.9rem; line-height: 1.6;">
+          <p>Configure parameters, connections, and settings for this node here.</p>
+        </div>
+      `;
+    }
+  </script><!-- Module 6: Toolbar Actions -->
+  <script>
+    function runWorkflow() {
+      const logsContent = document.getElementById('logs-content');
+      logsContent.innerHTML = `
+        <div style="color: #60a5fa;">⚡ Starting workflow execution...</div>
+        <div style="color: #94a3b8; margin-top: 0.5rem;">Found ${nodes.length} nodes</div>
+      `;
+      
+      nodes.forEach((node, index) => {
+        setTimeout(() => {
+          logsContent.innerHTML += `<div style="color: #10b981; margin-top: 0.3rem;">✓ Executed: ${node.name}</div>`;
+        }, (index + 1) * 500);
+      });
+
+      setTimeout(() => {
+        logsContent.innerHTML += `<div style="color: #60a5fa; margin-top: 0.8rem;">🎉 Workflow completed successfully!</div>`;
+      }, (nodes.length + 1) * 500);
+
+      document.getElementById('logs-panel').style.display = 'block';
+    }
+
+    function stopWorkflow() {
+      const logsContent = document.getElementById('logs-content');
+      logsContent.innerHTML += `<div style="color: #ef4444; margin-top: 0.5rem;">⏹️ Workflow execution stopped</div>`;
+    }
+
+    function saveWorkflow() {
+      const logsContent = document.getElementById('logs-content');
+      logsContent.innerHTML = `<div style="color: #10b981;">💾 Workflow saved successfully! (${nodes.length} nodes)</div>`;
+      document.getElementById('logs-panel').style.display = 'block';
+    }
+
+    function exportWorkflow() {
+      const workflow = {
+        nodes: nodes,
+        timestamp: new Date().toISOString()
+      };
+      const logsContent = document.getElementById('logs-content');
+      logsContent.innerHTML = `
+        <div style="color: #60a5fa;">📤 Exporting workflow...</div>
+        <div style="color: #94a3b8; margin-top: 0.5rem;">Nodes: ${nodes.length}</div>
+        <div style="color: #10b981; margin-top: 0.5rem;">✓ Export complete!</div>
+      `;
+      document.getElementById('logs-panel').style.display = 'block';
+    }
+
+    function clearCanvas() {
+      const canvas = document.getElementById('canvas');
+      canvas.innerHTML = `
+        <div style="text-align: center; color: #94a3b8; margin-top: 10rem; pointer-events: none;">
+          <div style="font-size: 3rem; margin-bottom: 1rem;">🎯</div>
+          <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem;">Drag components here to start building</h3>
+          <p>Create your AI workflow by connecting nodes</p>
+        </div>
+      `;
+      nodes = [];
+      selectedNode = null;
+      
+      const logsContent = document.getElementById('logs-content');
+      logsContent.innerHTML = `<div style="color: #94a3b8;">Canvas cleared. Ready to build...</div>`;
+    }
+
+    function toggleLogs() {
+      const logsPanel = document.getElementById('logs-panel');
+      logsPanel.style.display = logsPanel.style.display === 'none' ? 'block' : 'none';
+    }
+  </script><!-- Module 7: Element SDK Integration -->
+  <script>
+    async function onConfigChange(config) {
+      const titleEl = document.getElementById('hero-title');
+      const subtitleEl = document.getElementById('hero-subtitle');
+      const btnPrimaryEl = document.getElementById('btn-primary');
+      const btnSecondaryEl = document.getElementById('btn-secondary');
+
+      if (titleEl) titleEl.textContent = config.main_title || defaultConfig.main_title;
+      if (subtitleEl) subtitleEl.textContent = config.subtitle || defaultConfig.subtitle;
+      if (btnPrimaryEl) btnPrimaryEl.textContent = config.cta_primary || defaultConfig.cta_primary;
+      if (btnSecondaryEl) btnSecondaryEl.textContent = config.cta_secondary || defaultConfig.cta_secondary;
+    }
+
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange,
+        mapToCapabilities: (config) => ({
+          recolorables: [],
+          borderables: [],
+          fontEditable: undefined,
+          fontSizeable: undefined
+        }),
+        mapToEditPanelValues: (config) => new Map([
+          ["main_title", config.main_title || defaultConfig.main_title],
+          ["subtitle", config.subtitle || defaultConfig.subtitle],
+          ["cta_primary", config.cta_primary || defaultConfig.cta_primary],
+          ["cta_secondary", config.cta_secondary || defaultConfig.cta_secondary]
+        ])
+      });
+    }
+  </script><!-- Module 8: Initialization -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      initializeDragAndDrop();
+    });
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9ab85c7512f2804a',t:'MTc2NTMyMzc2OS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
