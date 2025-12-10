@@ -13,10 +13,11 @@ function addNodeToCanvas(name, type, icon, x, y) {
     <div style="font-size: 2rem; margin-bottom: 0.5rem;">${icon}</div>
     <div class="node-label">${name}</div>
     <div class="node-type">${type}</div>
-    <div class="connection-handles">
-      <div class="handle input-handle" title="Connect from previous node"></div>
-      <div class="handle output-handle" title="Connect to next node"></div>
-    </div>
+    <!-- four side handles: top, right, bottom, left -->
+    <div class="handle top" data-side="top" title="Top handle"></div>
+    <div class="handle right" data-side="right" title="Right handle"></div>
+    <div class="handle bottom" data-side="bottom" title="Bottom handle"></div>
+    <div class="handle left" data-side="left" title="Left handle"></div>
   `;
 
   nodes.push({ id: nodeId, name, type, icon, x, y });
@@ -25,12 +26,16 @@ function addNodeToCanvas(name, type, icon, x, y) {
   node.addEventListener('dragstart', handleNodeDragStart);
   node.addEventListener('dragend', handleNodeDragEnd);
 
-  // Add connection handle events
-  const outputHandle = node.querySelector('.output-handle');
-  const inputHandle = node.querySelector('.input-handle');
-  
-  outputHandle.addEventListener('mousedown', (e) => startConnection(e, nodeId, 'output'));
-  inputHandle.addEventListener('mousedown', (e) => startConnection(e, nodeId, 'input'));
+  // Add connection handle events for each side
+  const topHandle = node.querySelector('.handle.top');
+  const rightHandle = node.querySelector('.handle.right');
+  const bottomHandle = node.querySelector('.handle.bottom');
+  const leftHandle = node.querySelector('.handle.left');
+
+  if (topHandle) topHandle.addEventListener('mousedown', (e) => startConnection(e, nodeId, 'top'));
+  if (rightHandle) rightHandle.addEventListener('mousedown', (e) => startConnection(e, nodeId, 'right'));
+  if (bottomHandle) bottomHandle.addEventListener('mousedown', (e) => startConnection(e, nodeId, 'bottom'));
+  if (leftHandle) leftHandle.addEventListener('mousedown', (e) => startConnection(e, nodeId, 'left'));
 
   const canvas = document.getElementById('canvas');
   const placeholder = canvas.querySelector('div[style*="pointer-events: none"]');
@@ -100,13 +105,13 @@ function deleteNode(nodeId) {
 let isConnecting = false;
 let connectionFromNode = null;
 
-function startConnection(e, nodeId, handleType) {
+function startConnection(e, nodeId, handleSide) {
   e.preventDefault();
   e.stopPropagation();
-  
+
   isConnecting = true;
-  connectionFromNode = { id: nodeId, type: handleType };
-  
+  connectionFromNode = { id: nodeId, side: handleSide };
+
   const canvas = document.getElementById('canvas');
   canvas.style.cursor = 'crosshair';
 }
@@ -119,9 +124,7 @@ function drawTempConnectionLine(mouseX, mouseY) {
   const fromNode = document.getElementById(connectionFromNode.id);
   if (!fromNode) return;
   
-  const fromHandle = connectionFromNode.type === 'output' 
-    ? fromNode.querySelector('.output-handle')
-    : fromNode.querySelector('.input-handle');
+  const fromHandle = fromNode.querySelector(`.handle.${connectionFromNode.side}`);
   
   if (!fromHandle) return;
   
@@ -180,16 +183,17 @@ document.addEventListener('mousemove', (e) => {
 document.addEventListener('mouseup', (e) => {
   if (isConnecting && connectionFromNode) {
     const handle = e.target.closest('.handle');
-    
+
     if (handle) {
       const toNode = handle.closest('.canvas-node');
-      
+      const toSide = handle.dataset.side || (handle.classList.contains('top') ? 'top' : handle.classList.contains('right') ? 'right' : handle.classList.contains('bottom') ? 'bottom' : 'left');
+
       if (toNode && toNode.id !== connectionFromNode.id) {
-        // Connect from current node to target node, regardless of handle side
-        addConnection(connectionFromNode.id, toNode.id);
+        // Connect using specific handle sides
+        addConnection(connectionFromNode.id, connectionFromNode.side, toNode.id, toSide);
       }
     }
-    
+
     isConnecting = false;
     connectionFromNode = null;
     const canvas = document.getElementById('canvas');

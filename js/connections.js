@@ -82,9 +82,9 @@ function drawConnections() {
     if (fromNode && toNode) {
       const canvasRect = canvas.getBoundingClientRect();
 
-      // Get any handle from both nodes to draw the connection
-      const fromHandle = fromNode.querySelector('.handle');
-      const toHandle = toNode.querySelector('.handle');
+      // Get the specific handles from both nodes (by side)
+      const fromHandle = fromNode.querySelector(`.handle.${conn.fromSide}`);
+      const toHandle = toNode.querySelector(`.handle.${conn.toSide}`);
 
       if (fromHandle && toHandle) {
         const fromHandleRect = fromHandle.getBoundingClientRect();
@@ -114,17 +114,22 @@ function drawConnections() {
   });
 }
 
-function addConnection(fromNodeId, toNodeId) {
-  // Check if connection already exists
-  const exists = connections.some(c => c.from === fromNodeId && c.to === toNodeId);
+function addConnection(fromNodeId, fromSide, toNodeId, toSide) {
+  // Check if connection already exists (same from/to and sides)
+  const exists = connections.some(c => c.from === fromNodeId && c.to === toNodeId && c.fromSide === fromSide && c.toSide === toSide);
   if (!exists) {
-    connections.push({ from: fromNodeId, to: toNodeId });
+    connections.push({ from: fromNodeId, fromSide, to: toNodeId, toSide });
     drawConnections();
   }
 }
 
-function removeConnection(fromNodeId, toNodeId) {
-  connections = connections.filter(c => !(c.from === fromNodeId && c.to === toNodeId));
+function removeConnection(fromNodeId, toNodeId, fromSide, toSide) {
+  connections = connections.filter(c => {
+    if (fromSide && toSide) {
+      return !(c.from === fromNodeId && c.to === toNodeId && c.fromSide === fromSide && c.toSide === toSide);
+    }
+    return !(c.from === fromNodeId && c.to === toNodeId);
+  });
   drawConnections();
 }
 
