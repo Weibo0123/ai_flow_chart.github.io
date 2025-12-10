@@ -32,16 +32,26 @@ function initializeDragAndDrop() {
 
   canvas.addEventListener('drop', (e) => {
     e.preventDefault();
+    e.stopPropagation();
     canvas.classList.remove('drag-over');
+
+    // Only create new node if dragging from component panel (copy operation)
+    // If draggedNode exists, it's a move operation (don't create new node)
+    if (draggedNode) {
+      return; // Moving existing node, don't create new one
+    }
 
     const componentType = e.dataTransfer.getData('componentType');
     const componentName = e.dataTransfer.getData('componentName');
     const componentIcon = e.dataTransfer.getData('componentIcon');
 
-    const canvasRect = canvas.getBoundingClientRect();
-    const x = e.clientX - canvasRect.left - 80;
-    const y = e.clientY - canvasRect.top - 50;
+    // Only add new node if we have component data (from component panel)
+    if (componentType && componentName && componentIcon) {
+      const canvasRect = canvas.getBoundingClientRect();
+      const x = e.clientX - canvasRect.left - 80;
+      const y = e.clientY - canvasRect.top - 50;
 
-    addNodeToCanvas(componentName, componentType, componentIcon, x, y);
+      addNodeToCanvas(componentName, componentType, componentIcon, x, y);
+    }
   });
 }

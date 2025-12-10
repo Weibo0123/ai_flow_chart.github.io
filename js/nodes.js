@@ -30,8 +30,12 @@ function addNodeToCanvas(name, type, icon, x, y) {
 }
 
 function handleNodeDragStart(e) {
-  draggedNode = e.target;
-  e.dataTransfer.effectAllowed = 'move';
+  // Get the canvas-node element (in case a child element is clicked)
+  const canvasNode = e.target.closest('.canvas-node');
+  if (canvasNode) {
+    draggedNode = canvasNode;
+    e.dataTransfer.effectAllowed = 'move';
+  }
 }
 
 function handleNodeDragEnd(e) {
@@ -41,8 +45,11 @@ function handleNodeDragEnd(e) {
     const x = e.clientX - canvasRect.left - 80;
     const y = e.clientY - canvasRect.top - 50;
     
-    draggedNode.style.left = `${Math.max(0, x)}px`;
-    draggedNode.style.top = `${Math.max(0, y)}px`;
+    // Only update position if dropped within the canvas
+    if (x >= 0 && y >= 0) {
+      draggedNode.style.left = `${Math.max(0, x)}px`;
+      draggedNode.style.top = `${Math.max(0, y)}px`;
+    }
     
     draggedNode = null;
   }
