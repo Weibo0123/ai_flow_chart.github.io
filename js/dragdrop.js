@@ -1,7 +1,17 @@
 // Module 3: Drag & Drop for Components
+let dragDropInitialized = false;
+
 function initializeDragAndDrop() {
+  // Skip if already initialized to avoid duplicate listeners
+  if (dragDropInitialized) return;
+  
+  let canvas = document.getElementById('canvas');
+  if (!canvas) {
+    console.warn('Canvas not found for drag and drop initialization');
+    return;
+  }
+  
   const componentItems = document.querySelectorAll('.component-item');
-  const canvas = document.getElementById('canvas');
 
   // Setup drag events for component items
   componentItems.forEach(item => {
@@ -54,4 +64,6 @@ function initializeDragAndDrop() {
       addNodeToCanvas(componentName, componentType, componentIcon, x, y);
     }
   });
+  
+  dragDropInitialized = true;
 }

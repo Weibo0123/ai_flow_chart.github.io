@@ -25,6 +25,17 @@ function stopWorkflow() {
 }
 
 function saveWorkflow() {
+  // Save to current project if available
+  if (typeof currentProjectId !== 'undefined' && currentProjectId) {
+    const project = projects.find(p => p.id === currentProjectId);
+    if (project) {
+      project.nodes = nodes;
+      project.connections = connections;
+      project.updatedAt = new Date().toISOString();
+      saveProjects();
+    }
+  }
+  
   const logsContent = document.getElementById('logs-content');
   logsContent.innerHTML = `<div style="color: #10b981;">💾 Workflow saved successfully! (${nodes.length} nodes)</div>`;
   document.getElementById('logs-panel').style.display = 'block';

@@ -2,6 +2,7 @@
 function initializeApp() {
   initConnectionsSvg();
   initializeDragAndDrop();
+  initializeProjects();
   initElementSDK();
 }
 

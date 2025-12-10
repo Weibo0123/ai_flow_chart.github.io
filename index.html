@@ -81,9 +81,30 @@
       </div>
      </div>
     </div>
-   </div><!-- Editor Page -->
+   </div><!-- Projects List Page -->
    <div id="editor" class="page">
+    <div class="page-header">
+     <h1 class="page-title">My Projects</h1>
+     <p class="page-subtitle">Create and manage your AI agent workflows</p>
+    </div>
+    <div class="projects-header">
+     <button class="btn btn-primary" onclick="openNewProjectDialog()">✨ Create New Project</button>
+    </div>
+    <div id="projects-container" class="projects-grid">
+     <div id="empty-state" class="empty-state">
+      <div style="font-size: 4rem; margin-bottom: 1rem;">📋</div>
+      <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem; color: #cbd5e1;">No projects yet</h3>
+      <p style="color: #94a3b8; margin-bottom: 2rem;">Create your first AI workflow to get started</p>
+      <button class="btn btn-primary" onclick="openNewProjectDialog()">Create First Project</button>
+     </div>
+    </div>
+   </div><!-- Canvas Editor Page -->
+   <div id="canvas-editor" class="page">
     <div class="editor-toolbar">
+     <div class="toolbar-left">
+      <button class="toolbar-btn" onclick="goBackToProjects()" style="margin-right: auto;">← Back to Projects</button>
+      <span id="project-title-display" style="color: #818cf8; font-weight: 600; font-size: 1.1rem;"></span>
+     </div>
      <div class="toolbar-buttons"><button class="toolbar-btn" onclick="runWorkflow()">▶️ Run</button> <button class="toolbar-btn" onclick="stopWorkflow()">⏹️ Stop</button> <button class="toolbar-btn" onclick="saveWorkflow()">💾 Save</button> <button class="toolbar-btn" onclick="exportWorkflow()">📤 Export</button> <button class="toolbar-btn" onclick="clearCanvas()">🗑️ Clear</button>
      </div>
      <div class="toolbar-buttons"><button class="toolbar-btn" onclick="toggleLogs()">📋 Logs</button>
@@ -155,6 +176,24 @@
      <div class="properties-panel">
       <h3 class="panel-title">Properties</h3>
       <p style="color: #94a3b8; font-size: 0.95rem;">Select a node to view and edit its properties</p>
+     </div>
+    </div>
+   </div><!-- New Project Modal -->
+   <div id="project-modal" class="modal" style="display: none;">
+    <div class="modal-content">
+     <div class="modal-header">
+      <h2 class="modal-title">Create New Project</h2>
+      <button class="modal-close" onclick="closeNewProjectDialog()">✕</button>
+     </div>
+     <div class="modal-body">
+      <label for="project-name" class="modal-label">Project Name</label>
+      <input type="text" id="project-name" class="modal-input" placeholder="Enter project name..." />
+      <label for="project-description" class="modal-label" style="margin-top: 1.5rem;">Description (Optional)</label>
+      <textarea id="project-description" class="modal-input" placeholder="Enter project description..." style="resize: vertical; min-height: 100px;"></textarea>
+     </div>
+     <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeNewProjectDialog()">Cancel</button>
+      <button class="btn btn-primary" onclick="createNewProject()">Create Project</button>
      </div>
     </div>
    </div><!-- Component Library -->
@@ -705,6 +744,7 @@
   <!-- Application scripts in module order -->
   <script src="js/config.js"></script>
   <script src="js/navigation.js"></script>
+  <script src="js/projects.js"></script>
   <script src="js/dragdrop.js"></script>
   <script src="js/connections.js"></script>
   <script src="js/nodes.js"></script>
