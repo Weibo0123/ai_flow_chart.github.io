@@ -46,6 +46,7 @@ function exportWorkflow() {
 
 function clearCanvas() {
   const canvas = document.getElementById('canvas');
+  // Remove all canvas children (nodes, SVGs, placeholders)
   canvas.innerHTML = `
     <div style="text-align: center; color: #94a3b8; margin-top: 10rem; pointer-events: none;">
       <div style="font-size: 3rem; margin-bottom: 1rem;">🎯</div>
@@ -53,9 +54,40 @@ function clearCanvas() {
       <p>Create your AI workflow by connecting nodes</p>
     </div>
   `;
+
+  // Reset in-memory state
   nodes = [];
   selectedNode = null;
-  
+  draggedNode = null;
+
+  // Clear connection state and temporary visuals
+  if (typeof isConnecting !== 'undefined') {
+    isConnecting = false;
+    connectionFromNode = null;
+  }
+
+  if (typeof clearTempConnection === 'function') {
+    clearTempConnection();
+  }
+
+  // Remove persistent connections data and SVG overlay, then reinitialize
+  if (typeof connections !== 'undefined') {
+    connections = [];
+  }
+
+  if (typeof connectionsSvg !== 'undefined' && connectionsSvg) {
+    try {
+      if (connectionsSvg.parentNode) connectionsSvg.parentNode.removeChild(connectionsSvg);
+    } catch (err) {
+      console.warn('Failed to remove old connectionsSvg:', err);
+    }
+    connectionsSvg = null;
+  }
+
+  if (typeof initConnectionsSvg === 'function') {
+    initConnectionsSvg();
+  }
+
   const logsContent = document.getElementById('logs-content');
   logsContent.innerHTML = `<div style="color: #94a3b8;">Canvas cleared. Ready to build...</div>`;
 }
